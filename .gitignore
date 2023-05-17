@@ -53,3 +53,5 @@ docs/_build/
 
 *.db
 project/datasets/
+
+.idea/
