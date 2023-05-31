@@ -1,57 +1,69 @@
 import pandas as pd
-import numpy as np
 from sqlalchemy import create_engine
+import numpy as mplib
+
+def extract_data(file_path):
+    print("Performing data extraction...")
+    data_frame = pd.read_csv(file_path)
+    return data_frame
 
 
-dt1_klon = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Fahrrad_Zaehlstellen_Koeln_2016.csv"
-dt2_rad15 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Rad_15min.csv"
+def transform_data(data_frame, column_mapping):
+    print("Performing data transformation...")
 
-df_dt1 = pd.read_csv(dt1_klon)
-df_dt2 = pd.read_csv(dt2_rad15)
+    if column_mapping:
+        print("Applying column name mapping...")
+        data_frame = data_frame.rename(columns=column_mapping)
 
-print(df_dt1.head(5))
-print(df_dt2.head(5))
-
-# print("Data Transformation in progress...")
-#
-print("Renaming  columns to english names...")
-# Renaming the columns to english titles
-df_dt1.rename(
-    columns={
-        "Jahr 2016": "Year 2016",
-        "Deutzer BrÃ¼cke": "Deutzer Bridge",
-        "HohenzollernbrÃ¼cke": "Hohenzollern Bridge",
-        "Neumarkt":"New Market",
-        "ZÃ¼lpicher StraÃŸe":"Zulpicher Strasse",
-        "Bonner StraÃŸe": "Bonner Strasse",
-        "Venloer StraÃŸe":"Venloer Strasse",
-        "A.-SchÃ¼tte-Allee":"A.-Schuette-Allee",
-        "Vorgebirgspark":"foothill park",
-        "A.-Silbermann-Weg":"A.-Silbermann-Weg",
-        "Stadtwald":"city forest",
-        "NiederlÃ¤nder Ufer":"Dutch shore",
-    },
-    inplace=True,
-)
+    print("Replacing missing values...")
+    data_frame = data_frame.replace(mplib.nan, 0)
+    return data_frame
 
 
-df_dt2.rename(
-    columns={
-        "datum": "date",
-        "uhrzeit_start":"time_start",
-        "uhrzeit_ende":"time_end",
-        "zaehlstelle":"counting station",
-        "richtung_1":"direction_1",
-        "richtung_2":"direction_2",
-        "gesamt":"in total"
-    },
-    inplace=True,
-)
-
-df_dt1.replace(np.nan, 0)
-df_dt2.replace(np.nan, 0)
+def load_data(data_frame, table_name):
+    print("Performing database operations...")
+    engine = create_engine("sqlite:///cycles.db")
+    data_frame.to_sql(table_name, engine, if_exists="replace")
 
 
-engine = create_engine("sqlite:///cycles.db")
-df_dt1.to_sql("klon", engine, if_exists="replace")
-df_dt2.to_sql("rad15", engine, if_exists="replace")
+def driver():
+    data_file1 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Fahrrad_Zaehlstellen_Koeln_2016.csv"
+    data_file2 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Rad_15min.csv"
+
+    df1 = extract_data(data_file1)
+    column_mapping1 = {
+        "Year 2016": "Year",
+        "Deutzer Bridge": "Bridge1",
+        "Hohenzollern Bridge": "Bridge2",
+        "New Market": "Market",
+        "Zulpicher Strasse": "Street1",
+        "Bonner Strasse": "Street2",
+        "Venloer Strasse": "Street3",
+        "A.-Schuette-Allee": "Allee",
+        "Foothill Park": "Park",
+        "A.-Silbermann-Weg": "Weg",
+        "City Forest": "Forest",
+        "Dutch Shore": "Shore",
+    }
+
+
+    df1 = transform_data(df1, column_mapping1)
+    load_data(df1, "data1_table")
+
+    df2 = extract_data(data_file2)
+    column_mapping2 = {
+        "date": "Date",
+        "time_start": "Start Time",
+        "time_end": "End Time",
+        "counting_station": "Station",
+        "direction_1": "Direction1",
+        "direction_2": "Direction2",
+        "in_total": "Total",
+    }
+
+    df2 = transform_data(df2, column_mapping2)
+    load_data(df2, "data2_table")
+
+
+if __name__ == "__main__":
+    driver()
