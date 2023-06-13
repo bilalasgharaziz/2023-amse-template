@@ -9,7 +9,7 @@ def extract_data(file_path):
 
 
 def transform_data(data_frame, column_mapping):
-    print("Performing data transformation...")
+    print("Performing data transformation..")
 
     if column_mapping:
         print("Applying column name mapping...")
