@@ -30,10 +30,7 @@ def test_transformation(data, rename_columns):
 
 
 def test_data_loading(table_name):
-    # engine = create_engine("sqlite:///data/cycles.db")
-    engine = create_engine(f"sqlite:///data/cycles.db")
-
-
+    engine = create_engine(f"sqlite:///data/cycles.sqlite")
 
     # Create an inspector object
     inspector = inspect(engine)
