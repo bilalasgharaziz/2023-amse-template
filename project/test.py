@@ -2,13 +2,21 @@ from sqlalchemy import create_engine, inspect
 import pandas as pd
 
 from data.pipeline_cycles import (
-    extract_data as ex_data,
+    extract_data_csv as ex_data_csv,
+    extract_data_xls as ex_data_xls,
     transform_data as tr_data
 )
 
 
-def test_extraction(file_path):
-    df = ex_data(file_path)
+def test_extraction_C(file_path):
+    df = ex_data_csv(file_path)
+    assert not df.empty, "CSV Extraction Failed"
+    print("test_extraction: Test Passed")
+    return df
+
+
+def test_extraction_X(file_path):
+    df = ex_data_xls(file_path)
     assert not df.empty, "CSV Extraction Failed"
     print("test_extraction: Test Passed")
     return df
@@ -34,32 +42,33 @@ def test_data_loading(table_name):
 
 
 def test_pipeline():
-    file_path1 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Fahrrad_Zaehlstellen_Koeln_2016.csv"
-    df1 = test_extraction(file_path1)
-    df1 = test_transformation(df1, {"Year 2016": "Year",
-                                    "Deutzer Bridge": "Bridge1",
-                                    "Hohenzollern Bridge": "Bridge2",
-                                    "New Market": "Market",
-                                    "Zulpicher Strasse": "Street1",
-                                    "Bonner Strasse": "Street2",
-                                    "Venloer Strasse": "Street3",
-                                    "A.-Schuette-Allee": "Allee",
-                                    "Foothill Park": "Park",
+    file_path1 = "https://offenedaten-koeln.de/sites/default/files/Fahrrad_Zaehlstellen_Koeln_2016.csv"
+    df1 = test_extraction_C(file_path1)
+    df1 = test_transformation(df1, {"Jahr 2016": "Year",
+                                    "Deutzer Brücke": "Bridge1",
+                                    "Hohenzollernbrücke": "Bridge2",
+                                    "Neumarkt": "Market",
+                                    "Zülpicher Straße": "Street1",
+                                    "Bonner Straße": "Street2",
+                                    "Venloer Straße": "Street3",
+                                    "A.-Schütte-Allee": "Allee",
+                                    "Vorgebirgspark": "Park",
                                     "A.-Silbermann-Weg": "Weg",
-                                    "City Forest": "Forest",
-                                    "Dutch Shore": "Shore"})
+                                    "Stadtwald": "Forest",
+                                    "Niederländer Ufer": "Shore", })
+
     test_data_loading("data1_table")
 
-    file_path2 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Rad_15min.csv"
-    df2 = test_extraction(file_path2)
+    file_path2 = "https://docs.google.com/spreadsheets/d/1c2UFhtdrizPRbxWn7vNj9glfr1x77Yjb/export?format=xlsx"
+    df2 = test_extraction_X(file_path2)
     df2 = test_transformation(df2, {
-        "date": "Date",
-        "time_start": "Start Time",
-        "time_end": "End Time",
-        "counting_station": "Station",
-        "direction_1": "Direction1",
-        "direction_2": "Direction2",
-        "in_total": "Total"})
+        "datum": "Date",
+        "uhrzeit_start": "Start Time",
+        "uhrzeit_ende": "End Time",
+        "zaehlstelle": "Station",
+        "richtung_1": "Direction1",
+        "richtung_2": "Direction2",
+        "gesamt": "Total"})
 
     test_data_loading("data2_table")
 
