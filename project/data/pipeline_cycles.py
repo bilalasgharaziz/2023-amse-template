@@ -29,7 +29,8 @@ def transform_data(data_frame, column_mapping):
 
 def load_data(data_frame, table_name):
     print("Performing database operations...")
-    engine = create_engine("sqlite:///cycles.db")
+    # engine = create_engine("sqlite:///cycles.db")
+    engine = create_engine(f"sqlite:///data/cycles.db")
     data_frame.to_sql(table_name, engine, if_exists="replace")
 
 
