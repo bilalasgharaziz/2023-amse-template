@@ -1,10 +1,17 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import numpy as mplib
+import openpyxl
 
-def extract_data(file_path):
+def extract_data_csv(file_path):
     print("Performing data extraction...")
-    data_frame = pd.read_csv(file_path)
+    data_frame = pd.read_csv(file_path, sep=';')
+    return data_frame
+
+
+def extract_data_xls(file_path):
+    print("Performing data extraction...")
+    data_frame = pd.read_excel(file_path)
     return data_frame
 
 
@@ -27,43 +34,41 @@ def load_data(data_frame, table_name):
 
 
 def driver():
-    data_file1 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Fahrrad_Zaehlstellen_Koeln_2016.csv"
-    data_file2 = r"C:\Users\BilalAsgharAziz\OneDrive - Powercloud GmbH\Documents\Data Engineering\2023-amse-template\project\datasets\Rad_15min.csv"
+    data_file1 = "https://offenedaten-koeln.de/sites/default/files/Fahrrad_Zaehlstellen_Koeln_2016.csv"
+    data_file2 = "https://docs.google.com/spreadsheets/d/1c2UFhtdrizPRbxWn7vNj9glfr1x77Yjb/export?format=xlsx"
 
-    df1 = extract_data(data_file1)
+    df1 = extract_data_csv(data_file1)
     column_mapping1 = {
-        "Year 2016": "Year",
-        "Deutzer Bridge": "Bridge1",
-        "Hohenzollern Bridge": "Bridge2",
-        "New Market": "Market",
-        "Zulpicher Strasse": "Street1",
-        "Bonner Strasse": "Street2",
-        "Venloer Strasse": "Street3",
-        "A.-Schuette-Allee": "Allee",
-        "Foothill Park": "Park",
+        "Jahr 2016": "Year",
+        "Deutzer Brücke": "Bridge1",
+        "Hohenzollernbrücke": "Bridge2",
+        "Neumarkt": "Market",
+        "Zülpicher Straße": "Street1",
+        "Bonner Straße": "Street2",
+        "Venloer Straße": "Street3",
+        "A.-Schütte-Allee": "Allee",
+        "Vorgebirgspark": "Park",
         "A.-Silbermann-Weg": "Weg",
-        "City Forest": "Forest",
-        "Dutch Shore": "Shore",
+        "Stadtwald": "Forest",
+        "Niederländer Ufer": "Shore",
     }
-
 
     df1 = transform_data(df1, column_mapping1)
     load_data(df1, "data1_table")
 
-    df2 = extract_data(data_file2)
+    df2 = extract_data_xls(data_file2)
     column_mapping2 = {
-        "date": "Date",
-        "time_start": "Start Time",
-        "time_end": "End Time",
-        "counting_station": "Station",
-        "direction_1": "Direction1",
-        "direction_2": "Direction2",
-        "in_total": "Total",
+        "datum": "Date",
+        "uhrzeit_start": "Start Time",
+        "uhrzeit_ende": "End Time",
+        "zaehlstelle": "Station",
+        "richtung_1": "Direction1",
+        "richtung_2": "Direction2",
+        "gesamt": "Total",
     }
 
     df2 = transform_data(df2, column_mapping2)
     load_data(df2, "data2_table")
-
 
 if __name__ == "__main__":
     driver()
