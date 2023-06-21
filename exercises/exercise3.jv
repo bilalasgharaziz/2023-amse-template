@@ -1,0 +1,85 @@
+pipeline ModifiedCarPipeline 
+{
+
+	block ModifiedDataExtractor oftype HttpExtractor 
+    {
+		url: "https://www-genesis.destatis.de/genesis/downloads/00/tables/46251-0021_00.csv";
+	}
+
+	block ModifiedCarsTextFileDecoder oftype TextFileInterpreter 
+    {
+		encoding: "ASCII";
+	}
+
+	block ModifiedRowSelector oftype TextRangeSelector 
+	{
+        lineFrom: 7;
+        lineTo: 483;
+    }
+
+	block ModifiedCarsCSVDecoder oftype CSVInterpreter 
+    {
+		delimiter: ';';
+	}
+
+	// block ModifiedDeleteColumn oftype ColumnDeleter
+	// {
+	// 	 delete: [column D, column E, column F, column Q, column H, column I, column J, column K, column L, column N, column O, column P, column Q, column R, column S, column T, column U, column V, column X, column Y, column Z, column AA, column AB, column AC, column AD, column AE, column AF, column AH, column AI, column AJ, column AK, column AL, column AM, column AN, column AO, column AP, column AR, column AS, column AT, column AU, column AV, column AW, column AX, column AY, column AZ, column BB, column BC, column BD, column BE, column BF, column BQ, column BH, column BI, column BJ, column BL, column BM, column BM, column BQ, column BR, column BS, column BT, column BV, column BW, column BX, column BY, column BZ, column CA, column CB, column CC, column CD, column CE];
+	// }
+
+	valuetype ModifiedCIN oftype text
+	{
+		constraints: [ModifiedCINLength];
+	}
+	
+	constraint ModifiedCINLength oftype LengthConstraint
+	{
+		minLength: 0;
+		maxLength: 5;
+	}
+
+	valuetype ModifiedPositiveInteger oftype integer
+	{
+		constraints: [ModifiedOnlyPositiveInteger];
+
+	}
+
+	constraint ModifiedOnlyPositiveInteger oftype RangeConstraint
+	{
+		lowerBound:0;
+		lowerBoundInclusive: false;
+	}
+
+
+	block ModifiedCarsTableTableDecoder oftype TableInterpreter 
+	{
+		header: false;
+		columns: [
+			"date" oftype text,
+			"CIN" oftype ModifiedCIN,
+			"name" oftype text,
+			"petrol" oftype ModifiedPositiveInteger,
+			"diesel" oftype ModifiedPositiveInteger,
+			"gas" oftype ModifiedPositiveInteger,
+			"electro" oftype ModifiedPositiveInteger,
+			"hybrid" oftype ModifiedPositiveInteger,
+			"plugInHybrid" oftype ModifiedPositiveInteger,
+			"others" oftype ModifiedPositiveInteger
+		];
+	}
+
+	block ModifiedCarsLoader oftype SQLiteLoader 
+    {
+		table: "cars";
+		file: "./cars.sqlite";
+	}
+
+    ModifiedDataExtractor
+    ->ModifiedCarsTextFileDecoder
+	->ModifiedRowSelector
+    ->ModifiedCarsCSVDecoder
+	//->ModifiedDeleteColumn
+    ->ModifiedCarsTableTableDecoder
+    ->ModifiedCarsLoader;
+
+}
