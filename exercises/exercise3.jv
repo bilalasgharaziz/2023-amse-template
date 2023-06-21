@@ -1,28 +1,28 @@
 pipeline ModifiedCarPipeline 
 {
 
-	block ModifiedDataExtractor oftype HttpExtractor 
+	block DataDownloader oftype HttpExtractor 
     {
 		url: "https://www-genesis.destatis.de/genesis/downloads/00/tables/46251-0021_00.csv";
 	}
 
-	block ModifiedCarsTextFileDecoder oftype TextFileInterpreter 
+	block TextFileDecoder oftype TextFileInterpreter 
     {
 		encoding: "ASCII";
 	}
 
-	block ModifiedRowSelectors oftype TextRangeSelector 
+	block LineRangeSelector oftype TextRangeSelector 
 	{
         lineFrom: 7;
         lineTo: 483;
     }
 
-	block ModifiedCarsCSVDecoder oftype CSVInterpreter 
+	block CSVDecoder oftype CSVInterpreter 
     {
 		delimiter: ';';
 	}
 
-	// block ModifiedDeleteColumn oftype ColumnDeleter
+	// block ColumnRemover oftype ColumnDeleter
 	// {
 	// 	 delete: [column D, column E, column F, column Q, column H, column I, column J, column K, column L, column N, column O, column P, column Q, column R, column S, column T, column U, column V, column X, column Y, column Z, column AA, column AB, column AC, column AD, column AE, column AF, column AH, column AI, column AJ, column AK, column AL, column AM, column AN, column AO, column AP, column AR, column AS, column AT, column AU, column AV, column AW, column AX, column AY, column AZ, column BB, column BC, column BD, column BE, column BF, column BQ, column BH, column BI, column BJ, column BL, column BM, column BM, column BQ, column BR, column BS, column BT, column BV, column BW, column BX, column BY, column BZ, column CA, column CB, column CC, column CD, column CE];
 	// }
@@ -38,48 +38,48 @@ pipeline ModifiedCarPipeline
 		maxLength: 5;
 	}
 
-	valuetype ModifiedPositiveInteger oftype integer
+	valuetype PositiveIntegerValue oftype integer
 	{
-		constraints: [ModifiedOnlyPositiveInteger];
+		constraints: [OnlyPositiveInteger];
 
 	}
 
-	constraint ModifiedOnlyPositiveInteger oftype RangeConstraint
+	constraint OnlyPositiveInteger oftype RangeConstraint
 	{
-		lowerBound:0;
+		lowerBound: 0;
 		lowerBoundInclusive: false;
 	}
 
 
-	block ModifiedCarsTableTableDecoder oftype TableInterpreter 
+	block TableDecoder oftype TableInterpreter 
 	{
 		header: false;
 		columns: [
 			"date" oftype text,
 			"CIN" oftype ModifiedCIN,
 			"name" oftype text,
-			"petrol" oftype ModifiedPositiveInteger,
-			"diesel" oftype ModifiedPositiveInteger,
-			"gas" oftype ModifiedPositiveInteger,
-			"electro" oftype ModifiedPositiveInteger,
-			"hybrid" oftype ModifiedPositiveInteger,
-			"plugInHybrid" oftype ModifiedPositiveInteger,
-			"others" oftype ModifiedPositiveInteger
+			"petrol" oftype PositiveIntegerValue,
+			"diesel" oftype PositiveIntegerValue,
+			"gas" oftype PositiveIntegerValue,
+			"electro" oftype PositiveIntegerValue,
+			"hybrid" oftype PositiveIntegerValue,
+			"plugInHybrid" oftype PositiveIntegerValue,
+			"others" oftype PositiveIntegerValue
 		];
 	}
 
-	block ModifiedCarsLoader oftype SQLiteLoader 
+	block DBLoader oftype SQLiteLoader 
     {
 		table: "cars";
 		file: "./cars.sqlite";
 	}
 
-    ModifiedDataExtractor
-    ->ModifiedCarsTextFileDecoder
-	->ModifiedRowSelectors
-    ->ModifiedCarsCSVDecoder
-	//->ModifiedDeleteColumn
-    ->ModifiedCarsTableTableDecoder
-    ->ModifiedCarsLoader;
+    DataDownloader
+    ->TextFileDecoder
+	->LineRangeSelector
+    ->CSVDecoder
+	//->ColumnRemover
+    ->TableDecoder
+    ->DBLoader;
 
 }
