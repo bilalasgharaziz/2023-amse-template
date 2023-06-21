@@ -6,7 +6,7 @@ pipeline ModifiedCarPipeline
 		url: "https://www-genesis.destatis.de/genesis/downloads/00/tables/46251-0021_00.csv";
 	}
 
-	block TextFileDecoder oftype TextFileInterpreter 
+	block TextFilesDecoder oftype TextFileInterpreter 
     {
 		encoding: "ASCII";
 	}
@@ -75,7 +75,7 @@ pipeline ModifiedCarPipeline
 	}
 
     DataDownloader
-    ->TextFileDecoder
+    ->TextFilesDecoder
 	->LineRangeSelector
     ->CSVDecoder
 	//->ColumnRemover
