@@ -11,7 +11,7 @@ pipeline ModifiedCarPipeline
 		encoding: "ASCII";
 	}
 
-	block ModifiedRowSelector oftype TextRangeSelector 
+	block ModifiedRowSelectors oftype TextRangeSelector 
 	{
         lineFrom: 7;
         lineTo: 483;
@@ -76,7 +76,7 @@ pipeline ModifiedCarPipeline
 
     ModifiedDataExtractor
     ->ModifiedCarsTextFileDecoder
-	->ModifiedRowSelector
+	->ModifiedRowSelectors
     ->ModifiedCarsCSVDecoder
 	//->ModifiedDeleteColumn
     ->ModifiedCarsTableTableDecoder
