@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, inspect
 import pandas as pd
 
-from data.pipline import (
+from data.pipeline import (
     extract_data_xls as ex_data_xls,
     extract_data_xls as ex_data_xls,
     transform_data as tr_data
