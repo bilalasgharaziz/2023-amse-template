@@ -1,15 +1,15 @@
 from sqlalchemy import create_engine, inspect
 import pandas as pd
 
-from data.pipeline_cycles import (
-    extract_data_csv as ex_data_csv,
+from data.pipline import (
+    extract_data_xls as ex_data_xls,
     extract_data_xls as ex_data_xls,
     transform_data as tr_data
 )
 
 
 def test_extraction_C(file_path):
-    df = ex_data_csv(file_path)
+    df = ex_data_xls(file_path)
     assert not df.empty, "CSV Extraction Failed"
     print("test_extraction: Test Passed")
     return df
@@ -42,35 +42,39 @@ def test_data_loading(table_name):
 
 
 def test_pipeline():
-    file_path1 = "https://offenedaten-koeln.de/sites/default/files/Fahrrad_Zaehlstellen_Koeln_2016.csv"
+    file_path1 = "https://drive.google.com/uc?export=download&id=10-H4W8QHKhlsiFwI29-pUzdtH8ZZqidU"
     df1 = test_extraction_C(file_path1)
-    df1 = test_transformation(df1, {"Jahr 2016": "Year",
-                                    "Deutzer Brücke": "Bridge1",
-                                    "Hohenzollernbrücke": "Bridge2",
-                                    "Neumarkt": "Market",
-                                    "Zülpicher Straße": "Street1",
-                                    "Bonner Straße": "Street2",
-                                    "Venloer Straße": "Street3",
-                                    "A.-Schütte-Allee": "Allee",
-                                    "Vorgebirgspark": "Park",
-                                    "A.-Silbermann-Weg": "Weg",
-                                    "Stadtwald": "Forest",
-                                    "Niederländer Ufer": "Shore", })
+    df1 = test_transformation(df1, {
+        "Year 2017": "Year 2017",
+        "Deutzer Brücke": "Deutzer Brücke",
+        "Hohenzollernbrücke": "Hohenzollernbrücke",
+        "Neumarkt": "Neumarkt",
+        "Zülpicher Straße": "Zülpicher Straße",
+        "Bonner Straße": "Bonner Straße",
+        "Venloer Straße": "Venloer Straße",
+        "A.-Schütte-Allee": "A.-Schütte-Allee",
+        "Vorgebirgspark": "Vorgebirgspark",
+        "A.-Silbermann-Weg": "A.-Silbermann-Weg",
+        "Stadtwald": "Stadtwald",
+        "Niederländer Ufer": "Niederländer Ufer", })
 
     test_data_loading("data1_table")
 
-    file_path2 = "https://docs.google.com/spreadsheets/d/1c2UFhtdrizPRbxWn7vNj9glfr1x77Yjb/export?format=xlsx"
+    file_path2 = "https://drive.google.com/uc?export=download&id=1NrYUAKJYw2EYqLxDA4IiXNJM8axdPS1p"
     df2 = test_extraction_X(file_path2)
     df2 = test_transformation(df2, {
-        "datum": "Date",
-        "uhrzeit_start": "Start Time",
-        "uhrzeit_ende": "End Time",
-        "zaehlstelle": "Station",
-        "richtung_1": "Direction1",
-        "richtung_2": "Direction2",
-        "gesamt": "Total"})
+        "Year 2017": "Year 2017",
+        "Arnulf": "Arnulf",
+        "Erhardt": "Erhardt",
+        "Hirsch": "Hirsch",
+        "Kreuther": "Kreuther",
+        "Margareten": "Margareten",
+        "Olympia": "Olympia",
+        "Grand Total": "Grand Total"
+    })
 
     test_data_loading("data2_table")
+
 
 
 if __name__ == "__main__":
