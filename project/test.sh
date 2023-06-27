@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python ./data/pipeline_cycles.py
+python ./data/pipeline.py
 python test.py
 
 # Wait for user input before exiting
